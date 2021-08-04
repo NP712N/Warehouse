@@ -45,12 +45,26 @@ namespace Warehouse.Service
 
             return product;
         }
+
         public async Task<Product> RecieveProduct(ProductSetQuantityRequest request)
         {
             var product = await _context.Products.FindAsync(request.ProductId);
             if (product != null)
             {
                 product.Quantity += request.Quantity;
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+            }
+
+            return product;
+        }
+
+        public async Task<Product> DispatchProduct(ProductSetQuantityRequest request)
+        {
+            var product = await _context.Products.FindAsync(request.ProductId);
+            if (product != null)
+            {
+                product.Quantity -= request.Quantity;
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
             }
