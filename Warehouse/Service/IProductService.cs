@@ -11,8 +11,8 @@ namespace Warehouse.Service
     {
         Task<int> CreateProduct(ProductCreateRequest request);
         Task<List<Product>> GetProducts();
-        Task<Product> SetProductCapacity(ProductSetCapacityRequest request);
-        Task<Product> RecieveProduct(ProductSetQuantityRequest request);
-        Task<Product> DispatchProduct(ProductSetQuantityRequest request);
+        Task<int> SetProductCapacity(ProductSetCapacityRequest request);
+        Task<int> RecieveProduct(ProductSetQuantityRequest request);
+        Task<int> DispatchProduct(ProductSetQuantityRequest request);
     }
 }

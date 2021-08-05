@@ -26,55 +26,67 @@ namespace Warehouse.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             var products = await _productService.GetProducts();
-            return Ok(products);
+            return Ok(products.Where(p => p.Quantity > 0));
         }
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateRequest request)
         {
-            var productId = await _productService.CreateProduct(request);
-            if (productId > 0) return Ok(productId);
+            var result = await _productService.CreateProduct(request);
+            if (result == 1) return Ok(result);
 
             return BadRequest();
         }
 
         [HttpPut("{id}/{capacity}")]
-        public async Task<ActionResult<Product>> SetProductCapacity(int id, long capacity)
+        public async Task<ActionResult<string>> SetProductCapacity(int id, long capacity)
         {
-            var request = new ProductSetCapacityRequest() {
+            if (capacity < 1) return BadRequest("Capacity should not less than or equal to zero");
+
+            var request = new ProductSetCapacityRequest()
+            {
                 ProductId = id,
                 Capacity = capacity
             };
 
-            var product = await _productService.SetProductCapacity(request);
-            if (product.Capacity == request.Capacity) return Ok(product);
+            var result = await _productService.SetProductCapacity(request);
+            if (result == 1) return Ok(id);
 
-            return BadRequest();
+            return BadRequest("Capacity should be greater than quantity");
         }
 
         [HttpPut("{id}/recieve/{quantity}")]
-        public async Task<ActionResult<Product>> RecieveProduct(int id, long quantity)
+        public async Task<ActionResult<string>> RecieveProduct(int id, long quantity)
         {
-            var request = new ProductSetQuantityRequest() {
-                ProductId = id,
-                Quantity = quantity
-            };
+            if (quantity < 1) return BadRequest("Quantity should not less than or equal to zero");
 
-            var product = await _productService.RecieveProduct(request);
-            return Ok(product);
-        }
-
-        [HttpPut("{id}/dispatch/{quantity}")]
-        public async Task<ActionResult<Product>> DispatchProduct(int id, long quantity)
-        {
             var request = new ProductSetQuantityRequest()
             {
                 ProductId = id,
                 Quantity = quantity
             };
 
-            var product = await _productService.DispatchProduct(request);
-            return Ok(product);
+            var result = await _productService.RecieveProduct(request);
+            if (result == 1) return Ok(id);
+
+            return BadRequest("Capacity should be greater than quantity");
+        }
+
+        [HttpPut("{id}/dispatch/{quantity}")]
+        public async Task<ActionResult<string>> DispatchProduct(int id, long quantity)
+        {
+            if (quantity < 1) return BadRequest("Quantity should not less than or equal to zero");
+
+            var request = new ProductSetQuantityRequest()
+            {
+                ProductId = id,
+                Quantity = quantity
+            };
+
+            var result = await _productService.DispatchProduct(request);
+            if (result == 1) return Ok(id);
+
+            return BadRequest("Capacity should be greater than quantity");
         }
     }
 }
