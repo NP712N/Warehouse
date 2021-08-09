@@ -1,0 +1,43 @@
+<mat-card>
+  <h1>Products: </h1>
+
+  <ng-container *ngIf="isLoading">
+    <mat-spinner class="loading-spinner"></mat-spinner>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading">
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z8 product-table">
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef>Id</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let row">{{row.productId}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.productName}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="capacity">
+        <mat-header-cell *matHeaderCellDef>Capacity</mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.capacity}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="quantity">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.quantity}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <button mat-icon-button aria-label="Edit" (click)="saveChanges(row)">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row matRipple *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </ng-container>
+</mat-card>
