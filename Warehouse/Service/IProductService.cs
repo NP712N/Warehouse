@@ -9,10 +9,14 @@ namespace Warehouse.Service
 {
     public interface IProductService
     {
-        Task<int> CreateProduct(ProductCreateRequest request);
-        Task<List<Product>> GetProducts();
-        Task<int> SetProductCapacity(ProductSetCapacityRequest request);
-        Task<int> RecieveProduct(ProductSetQuantityRequest request);
-        Task<int> DispatchProduct(ProductSetQuantityRequest request);
+        ICollection<Product> GetProducts();
+        Product GetProduct(int productId);
+        bool CreateProduct(Product product);
+        bool UpdateProduct(Product product);
+        bool SetProductCapacity(Product product, long capacity);
+        bool RecieveProduct(Product product, long quantity);
+        bool DispatchProduct(Product product, long quantity);
+        bool IsProductExists(string name);
+        bool IsProductExists(int id);
     }
 }

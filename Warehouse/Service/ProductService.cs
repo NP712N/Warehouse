@@ -16,61 +16,68 @@ namespace Warehouse.Service
             _context = context;
         }
 
-        public async Task<int> CreateProduct(ProductCreateRequest request)
+        public bool CreateProduct(Product product)
         {
-            var product = new Product()
-            {
-                ProductName = request.ProductName,
-                Capacity = request.Capacity,
-                Quantity = request.Quantity
-            };
-
             _context.Products.Add(product);
-            return await _context.SaveChangesAsync();
+            return Save();
         }
 
-        public async Task<List<Product>> GetProducts()
+        public ICollection<Product> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return _context.Products.OrderBy(n => n.ProductName).ToList();
         }
 
-        public async Task<int> SetProductCapacity(ProductSetCapacityRequest request)
+        public Product GetProduct(int productId)
         {
-            var product = await _context.Products.FindAsync(request.ProductId);
-            if (product == null) return 0;
-            if (request.Capacity < product.Quantity) return 2;
+            return _context.Products.FirstOrDefault(n => n.ProductId == productId);
+        }
 
-            product.Capacity = request.Capacity;
+        public bool SetProductCapacity(Product product, long capacity)
+        {
+            product.Capacity = capacity;
             _context.Products.Update(product);
 
-            return await _context.SaveChangesAsync();
+            return UpdateProduct(product);
         }
 
-        public async Task<int> RecieveProduct(ProductSetQuantityRequest request)
+        public bool RecieveProduct(Product product, long quantity)
         {
-            var product = await _context.Products.FindAsync(request.ProductId);
-            if (product == null) return 0;
-
-            product.Quantity += request.Quantity;
-            if (product.Quantity > product.Capacity) return 2;
-
+            product.Quantity += quantity;
             _context.Products.Update(product);
 
-            return await _context.SaveChangesAsync();
+            return UpdateProduct(product);
         }
 
-        public async Task<int> DispatchProduct(ProductSetQuantityRequest request)
+        public bool DispatchProduct(Product product, long quantity)
         {
-            var product = await _context.Products.FindAsync(request.ProductId);
-            if (product == null) return 0;
-
-            product.Quantity -= request.Quantity;
-            if (product.Quantity > product.Capacity) return 2;
-
+            product.Quantity -= quantity;
             _context.Products.Update(product);
 
-            return await _context.SaveChangesAsync();
+            return UpdateProduct(product);
         }
+
+        public bool IsProductExists(string name)
+        {
+            return _context.Products.Any(n => n.ProductName.ToLower().Trim() == name.ToLower().Trim());
+        }
+
+        public bool IsProductExists(int id)
+        {
+            return _context.Products.Any(n => n.ProductId == id);
+        }
+
+        public bool UpdateProduct(Product product)
+        {
+            _context.Products.Update(product);
+            return Save();
+
+        }
+
+        private bool Save()
+        {
+            return _context.SaveChanges() < 0 ? false : true;
+        }
+
 
     }
 }

@@ -23,70 +23,135 @@ namespace Warehouse.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public IActionResult GetProducts()
         {
-            var products = await _productService.GetProducts();
-            return Ok(products.Where(p => p.Quantity > 0));
+            var list = _productService.GetProducts();
+            return Ok(list);
         }
+
+        [HttpGet("{productId}", Name = "GetProduct")]
+        public IActionResult GetProduct(int productId)
+        {
+            var product = _productService.GetProduct(productId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(product);
+        }
+
 
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct(ProductCreateRequest request)
+        public IActionResult CreateProduct([FromBody] Product product)
         {
-            var result = await _productService.CreateProduct(request);
-            if (result == 1) return Ok(result);
-
-            return BadRequest();
-        }
-
-        [HttpPut("{id}/{capacity}")]
-        public async Task<ActionResult<string>> SetProductCapacity(int id, long capacity)
-        {
-            if (capacity < 1) return BadRequest("Capacity should not less than or equal to zero");
-
-            var request = new ProductSetCapacityRequest()
+            if (product == null)
             {
-                ProductId = id,
-                Capacity = capacity
-            };
+                return BadRequest(ModelState);
+            }
 
-            var result = await _productService.SetProductCapacity(request);
-            if (result == 1) return Ok(id);
-
-            return BadRequest("Capacity should be greater than quantity");
-        }
-
-        [HttpPut("{id}/recieve/{quantity}")]
-        public async Task<ActionResult<string>> RecieveProduct(int id, long quantity)
-        {
-            if (quantity < 1) return BadRequest("Quantity should not less than or equal to zero");
-
-            var request = new ProductSetQuantityRequest()
+            if (!_productService.CreateProduct(product))
             {
-                ProductId = id,
-                Quantity = quantity
-            };
+                ModelState.AddModelError("", $"Something went wrong when adding {product.ProductName}");
+                return StatusCode(500, ModelState);
+            }
 
-            var result = await _productService.RecieveProduct(request);
-            if (result == 1) return Ok(id);
-
-            return BadRequest("Capacity should be greater than quantity");
+            return CreatedAtRoute("GetProduct", new { productId = product.ProductId }, product);
         }
 
-        [HttpPut("{id}/dispatch/{quantity}")]
-        public async Task<ActionResult<string>> DispatchProduct(int id, long quantity)
+        [HttpPatch("{id}/{capacity}")]
+        public IActionResult SetProductCapacity(int id, long capacity)
         {
-            if (quantity < 1) return BadRequest("Quantity should not less than or equal to zero");
-
-            var request = new ProductSetQuantityRequest()
+            if (capacity < 1)
             {
-                ProductId = id,
-                Quantity = quantity
-            };
+                ModelState.AddModelError("", "Capacity should not less than or equal to zero");
+                return StatusCode(404, ModelState);
+            }
 
-            var result = await _productService.DispatchProduct(request);
-            if (result == 1) return Ok(id);
+            var product = _productService.GetProduct(id);
+            if (product == null)
+            {
+                ModelState.AddModelError("", "Product is not exists!");
+                return BadRequest(ModelState);
+            }
 
-            return BadRequest("Capacity should be greater than quantity");
+            if (product.Quantity > capacity)
+            {
+                ModelState.AddModelError("", "Capacity should be greater than quantity");
+                return StatusCode(404, ModelState);
+            }
+
+            if (!_productService.SetProductCapacity(product, capacity))
+            {
+                ModelState.AddModelError("", $"Something went wrong when set product capapcity {product.ProductName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok(id);
         }
+
+        [HttpPatch("{id}/recieve/{quantity}")]
+        public IActionResult RecieveProduct(int id, long quantity)
+        {
+            if (quantity < 1)
+            {
+                ModelState.AddModelError("", "Quantity should not less than or equal to zero");
+                return StatusCode(404, ModelState);
+            }
+
+            var product = _productService.GetProduct(id);
+            if (product == null)
+            {
+                ModelState.AddModelError("", "Product is not exists!");
+                return BadRequest(ModelState);
+            }
+
+            if (product.Capacity < quantity)
+            {
+                ModelState.AddModelError("", "Capacity should be greater than quantity");
+                return StatusCode(404, ModelState);
+            }
+
+            if (!_productService.RecieveProduct(product, quantity))
+            {
+                ModelState.AddModelError("", $"Something went wrong when recieving product {product.ProductName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok(id);
+        }
+
+        [HttpPatch("{id}/dispatch/{quantity}")]
+        public IActionResult DispatchProduct(int id, long quantity)
+        {
+            if (quantity < 1)
+            {
+                ModelState.AddModelError("", "Quantity should not less than or equal to zero");
+                return StatusCode(404, ModelState);
+            }
+
+            var product = _productService.GetProduct(id);
+            if (product == null)
+            {
+                ModelState.AddModelError("", "Product is not exists!");
+                return BadRequest(ModelState);
+            }
+
+            if (product.Capacity < quantity)
+            {
+                ModelState.AddModelError("", "Capacity should be greater than quantity");
+                return StatusCode(404, ModelState);
+            }
+
+            if (!_productService.DispatchProduct(product, quantity))
+            {
+                ModelState.AddModelError("", $"Something went wrong when dispatching product {product.ProductName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok(id);
+        }
+
+        //TODO: Add validation to make code reuseable
     }
 }
