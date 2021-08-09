@@ -1,1 +1,38 @@
-<p>product-detail works!</p>
+<ng-container>
+  <h1>Create new product</h1>
+
+  <form class="create-form" [formGroup]="formData">
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Name</mat-label>
+      <input formControlName="productName" matInput placeholder="Name">
+      <mat-error>
+        <ng-container *ngIf="formData.controls.productName.hasError('required')">
+          This field is required
+        </ng-container>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Capacity</mat-label>
+      <input formControlName="capacity" type="number" matInput placeholder="capacity">
+      <mat-error>
+        <ng-container *ngIf="formData.controls.capacity.hasError('required')">
+          This field is required
+        </ng-container>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Quantity</mat-label>
+      <input formControlName="quantity" type="number" matInput placeholder="quantity">
+      <mat-error>
+        <ng-container *ngIf="formData.controls.quantity.hasError('max')">
+          This field should be lower than or equal to {{formData.controls.capacity.value}}
+        </ng-container>
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button (click)="create()" class="mb-1 add-new">Create</button>
+  </form>
+
+</ng-container>

@@ -50,15 +50,72 @@ namespace Warehouse.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (request.Capacity < 1)
+            {
+                ModelState.AddModelError("", "Capacity should not less than or equal to zero");
+                return StatusCode(404, ModelState);
+            }
+            if (request.Capacity < request.Quantity)
+            {
+                ModelState.AddModelError("", "Capacity should be greater than quantity");
+                return StatusCode(404, ModelState);
+            }
+
+
             var productId = _productService.CreateProduct(request);
             if (productId== 0)
             {
                 ModelState.AddModelError("", $"Something went wrong when adding {request.ProductName}");
                 return StatusCode(500, ModelState);
             }
-
+            
             return GetProduct(productId);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteProduct(int id)
+        {
+            if (!_productService.DeleteById(id))
+            {
+                ModelState.AddModelError("", $"Something went wrong when deleting");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok();
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult UpdateProduct(int id, [FromBody] ProductUpdateRequest payload)
+        {
+            if (payload.Capacity < 1)
+            {
+                ModelState.AddModelError("", "Capacity should not less than or equal to zero");
+                return StatusCode(404, ModelState);
+            }
+
+            var product = _productService.GetProduct(id);
+            if (product == null)
+            {
+                ModelState.AddModelError("", "Product is not exists!");
+                return BadRequest(ModelState);
+            }
+
+            if (product.Quantity > payload.Capacity || payload.Capacity < payload.Quantity)
+            {
+                ModelState.AddModelError("", "Capacity should be greater than quantity");
+                return StatusCode(404, ModelState);
+            }
+
+            if (!_productService.UpdateProduct(product, payload))
+            {
+                ModelState.AddModelError("", $"Something went wrong when set product capapcity {product.ProductName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok(id);
+        }
+
+
 
         [HttpPatch("{id}/{capacity}")]
         public IActionResult SetProductCapacity(int id, long capacity)

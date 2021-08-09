@@ -1,7 +1,7 @@
 import { FormGroup } from "@angular/forms";
 
 export interface InlineEditable {
-  id: number;
+  productId: number;
   editable: boolean;
   loading: boolean;
   dataForm: FormGroup;

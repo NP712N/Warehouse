@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductDetail, ProductDetailRow } from '../shared/product-detail.model';
+import { ProductDetail, ProductDetailRow, ProductDetailUpdatePayload } from '../shared/product-detail.model';
 import { ProductDetailService } from '../shared/product-detail.service';
 import { finalize, map, catchError, takeUntil } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, of, Subject } from 'rxjs';
 import { DataQueryResponse } from '../shared/data-query-response.model';
+import { MatDialog } from '@angular/material/dialog';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
+import { UtilServiceService } from '../shared/util-service.service';
 
 @Component({
   selector: 'app-product-details',
@@ -19,7 +22,11 @@ export class ProductDetailsComponent implements OnInit {
 
   formData: FormGroup;
 
-  constructor(public service: ProductDetailService) {
+  constructor(
+    public productDetailService: ProductDetailService,
+    private _utilServiceService: UtilServiceService,
+    private readonly _dialog: MatDialog
+  ) {
 
   }
 
@@ -33,15 +40,46 @@ export class ProductDetailsComponent implements OnInit {
     this._initializeData();
   }
 
-  public saveChanges(row: ProductDetailRow): void {
-    //TODO: update product detail
-    console.log(row);
+  public addNewProductDialog(): void {
+    const dialogRef = this._dialog.open(ProductDetailComponent);
+
+    dialogRef.afterClosed().subscribe(id => {
+      if (id) {
+        this._initializeData();
+      }
+    });
+  }
+
+  public constructSaveFn(row: ProductDetailRow): () => Observable<number> {
+    return () => {
+      const payload: ProductDetailUpdatePayload = {
+        productName: row.dataForm.controls.productName.value,
+        capacity: row.dataForm.controls.capacity.value,
+        quantity: row.dataForm.controls.quantity.value
+      };
+
+      return this.productDetailService.updateProductDetail(row.productId, payload).pipe(map(() => row.productId));
+    }
+  }
+
+  public constructDetailsFn(): (id: number) => Observable<ProductDetail> {
+    return (id: number) => this._utilServiceService.execute(this.productDetailService.getProductDetail(id));
+  }
+
+  public delete(id: number): void {
+    this._utilServiceService.execute(this.productDetailService.deleteProductDetail(id))
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this._initializeData();
+        }))
+      .subscribe();
   }
 
   private _initializeData() {
     this.isLoading = true;
 
-    this.execute(this._constructDataQuery())
+    this._utilServiceService.execute(this._constructDataQuery())
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -52,7 +90,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   private _constructDataQuery(): Observable<DataQueryResponse<ProductDetail>> {
-    return this.execute(this.service.getProducts())
+    return this._utilServiceService.execute(this.productDetailService.getProducts())
       .pipe(
         map(dataResponse => {
           const parseData = dataResponse.map(item => {
@@ -66,16 +104,5 @@ export class ProductDetailsComponent implements OnInit {
             data: parseData
           }
         }));
-  }
-
-  private execute<T>(observale: Observable<T>, fallbackResult?: T): Observable<T> {
-    let _cancellationToken: Subject<void> = new Subject();
-
-    let fn = observale;
-    if (fallbackResult) {
-      fn = fn.pipe(catchError(() => of(fallbackResult)));
-    }
-
-    return fn.pipe(takeUntil(_cancellationToken.asObservable()));
   }
 }

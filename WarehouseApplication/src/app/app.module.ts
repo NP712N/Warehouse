@@ -17,14 +17,15 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
-
+import { QuickEditComponent } from './quick-edit/quick-edit/quick-edit.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductDetailsComponent,
-    ProductDetailComponent
+    ProductDetailComponent,
+    QuickEditComponent
   ],
   imports: [
     BrowserModule,
@@ -41,7 +42,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatRippleModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

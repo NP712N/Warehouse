@@ -8,8 +8,14 @@ export class ProductDetail {
   quantity: number;
 }
 
+export class ProductDetailUpdatePayload {
+  productName: string;
+  capacity: number;
+  quantity: number;
+}
+
 export class ProductDetailRow extends ProductDetail implements InlineEditable {
-  id: number;
+  productId: number;
   editable: boolean;
   loading: boolean;
   dataForm: FormGroup;

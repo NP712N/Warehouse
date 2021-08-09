@@ -75,8 +75,27 @@ namespace Warehouse.Service
             return _context.Products.Any(n => n.ProductId == id);
         }
 
-        public bool UpdateProduct(Product product)
+        public bool DeleteById(int id)
         {
+            var product = GetProduct(id);
+            if(product == null)
+            {
+                return false;
+            }
+
+            _context.Products.Remove(product);
+            return Save();
+        }
+
+        public bool UpdateProduct(Product product, ProductUpdateRequest payload = null)
+        {
+            if(payload != null)
+            {
+                product.Capacity = payload.Capacity;
+                product.ProductName = payload.ProductName;
+                product.Quantity = payload.Quantity;
+            }
+
             _context.Products.Update(product);
             return Save();
 

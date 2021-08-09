@@ -1,0 +1,15 @@
+<ng-container *ngIf="!data?.editable">
+  <button mat-icon-button aria-label="Edit" (click)="enableEditMode()">
+    <mat-icon aria-hidden="false">edit</mat-icon>
+  </button>
+</ng-container>
+
+<ng-container *ngIf="data?.editable">
+  <button mat-icon-button aria-label="Edit" (click)="saveChanges()">
+    <mat-icon aria-hidden="false">check</mat-icon>
+  </button>
+
+  <button mat-icon-button aria-label="Edit" (click)="discardChanges()">
+    <mat-icon aria-hidden="false">close</mat-icon>
+  </button>
+</ng-container>

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Warehouse.Service.ProductRequest
 {
-    public class ProductUpdateRequest
+    public class ProductCreateRequest
     {
         public string ProductName { set; get; }
         public long Capacity { set; get; }
