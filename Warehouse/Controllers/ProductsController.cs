@@ -43,20 +43,21 @@ namespace Warehouse.Controllers
 
 
         [HttpPost]
-        public IActionResult CreateProduct([FromBody] Product product)
+        public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
         {
-            if (product == null)
+            if (request == null)
             {
                 return BadRequest(ModelState);
             }
 
-            if (!_productService.CreateProduct(product))
+            var productId = _productService.CreateProduct(request);
+            if (productId== 0)
             {
-                ModelState.AddModelError("", $"Something went wrong when adding {product.ProductName}");
+                ModelState.AddModelError("", $"Something went wrong when adding {request.ProductName}");
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtRoute("GetProduct", new { productId = product.ProductId }, product);
+            return GetProduct(productId);
         }
 
         [HttpPatch("{id}/{capacity}")]

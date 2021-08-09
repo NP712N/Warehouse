@@ -16,10 +16,19 @@ namespace Warehouse.Service
             _context = context;
         }
 
-        public bool CreateProduct(Product product)
+        public int CreateProduct(ProductCreateRequest request)
         {
-            _context.Products.Add(product);
-            return Save();
+            var newProduct = new Product() {
+                ProductName = request.ProductName,
+                Capacity = request.Capacity,
+                Quantity = request.Quantity
+            };
+            _context.Products.Add(newProduct);
+
+            if (Save())
+                return newProduct.ProductId;
+
+            return 0;
         }
 
         public ICollection<Product> GetProducts()

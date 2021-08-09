@@ -11,7 +11,7 @@ namespace Warehouse.Service
     {
         ICollection<Product> GetProducts();
         Product GetProduct(int productId);
-        bool CreateProduct(Product product);
+        int CreateProduct(ProductCreateRequest request);
         bool UpdateProduct(Product product);
         bool SetProductCapacity(Product product, long capacity);
         bool RecieveProduct(Product product, long quantity);
