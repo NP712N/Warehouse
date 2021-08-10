@@ -3,7 +3,7 @@ import { ProductDetail, ProductDetailRow, ProductDetailUpdatePayload } from '../
 import { ProductDetailService } from '../shared/product-detail.service';
 import { finalize, map, catchError, takeUntil } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject, Subscription } from 'rxjs';
 import { DataQueryResponse } from '../shared/data-query-response.model';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
@@ -16,11 +16,11 @@ import { UtilServiceService } from '../shared/util-service.service';
 })
 export class ProductDetailsComponent implements OnInit {
 
-  dataSource: ProductDetail[];
+  dataSource: ProductDetail[] = [];
   isLoading: boolean = false;
   displayedColumns: string[] = ['id', 'name', 'capacity', 'quantity', 'action'];
-
   formData: FormGroup;
+  subscription: Subscription;
 
   constructor(
     public productDetailService: ProductDetailService,
@@ -36,8 +36,18 @@ export class ProductDetailsComponent implements OnInit {
       capacity: new FormControl(null),
       quantity: new FormControl(null),
     })
-
     this._initializeData();
+
+    this.subscription = this.productDetailService.currentDataSource.subscribe(data => {
+      const parseData = data.map(item => {
+        const row = Object.assign(new ProductDetailRow(), item);
+        row.resetDataForm();
+        return row;
+      });
+
+      this.dataSource = parseData
+    })
+
   }
 
   public addNewProductDialog(): void {
@@ -58,8 +68,16 @@ export class ProductDetailsComponent implements OnInit {
         quantity: row.dataForm.controls.quantity.value
       };
 
-      return this.productDetailService.updateProductDetail(row.productId, payload).pipe(map(() => row.productId));
+      return this.productDetailService.updateProductDetail(row.productId, payload).pipe(
+        finalize(() => {
+        }),
+        map(() => row.productId)
+      );
     }
+  }
+
+  public savedItem(product: ProductDetail): void {
+    this.productDetailService.dataItemOnchanged(product);
   }
 
   public constructDetailsFn(): (id: number) => Observable<ProductDetail> {
@@ -85,7 +103,7 @@ export class ProductDetailsComponent implements OnInit {
           this.isLoading = false;
         }))
       .subscribe(dataResponse => {
-        this.dataSource = dataResponse.data
+        this.productDetailService.dataSourceOnchanged(dataResponse.data);
       });
   }
 

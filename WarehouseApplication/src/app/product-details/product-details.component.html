@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card style="margin-bottom: 20px;">
   <h1>Products: </h1>
 
   <button mat-raised-button (click)="addNewProductDialog()" class="mb-1 add-new">Add new Product</button>
@@ -56,7 +56,8 @@
       <ng-container matColumnDef="action">
         <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          <app-quick-edit [data]="row" [saveFn]="constructSaveFn(row)" [detailsFn]="constructDetailsFn()">
+          <app-quick-edit [data]="row" (saved)="savedItem($event)" [saveFn]="constructSaveFn(row)"
+            [detailsFn]="constructDetailsFn()">
           </app-quick-edit>
 
           <button mat-icon-button aria-label="Delete" (click)="delete(row.productId)">

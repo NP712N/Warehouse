@@ -1,0 +1,8 @@
+<mat-card>
+  <h1>Products by AG grid: </h1>
+
+  <ag-grid-angular class="ag-theme-alpine ag-grid" (cellValueChanged)="onCellValueChanged($event)" [pagination]="true"
+    [defaultColDef]="defaultColDef" [rowData]="dataSource" [columnDefs]="columnDefs"
+    [overlayLoadingTemplate]="overlayLoadingTemplate">
+  </ag-grid-angular>
+</mat-card>

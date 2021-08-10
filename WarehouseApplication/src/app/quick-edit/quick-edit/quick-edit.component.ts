@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { InlineEditable } from 'src/app/shared/inline-editable.model';
@@ -14,10 +15,11 @@ export class QuickEditComponent implements OnInit {
   @Input() data: InlineEditable;
   @Input() detailsFn: (id: number) => Observable<any>;
   @Input() saveFn: () => Observable<number>;
-  @Output() saved: EventEmitter<void> = new EventEmitter();
-  @Output() discarded: EventEmitter<void> = new EventEmitter();
+  @Output() saved = new EventEmitter<any>();
 
-  constructor() { }
+  constructor(
+    private _toastr: ToastrService
+  ) { }
 
   ngOnInit(): void {
   }
@@ -29,12 +31,13 @@ export class QuickEditComponent implements OnInit {
   public saveChanges(): void {
     this.saveFn().subscribe(
       (id: number) => {
+        this._toastr.success("OK", "Update product");
         this._loadItemDetail(id);
-        this.saved.emit();
         this._toggleEditMode(false);
       },
       (error: HttpErrorResponse) => {
         console.log(error);
+        this._toastr.error(error.error[""].errors[0].errorMessage, "Update product");
       }
     )
   }
@@ -42,7 +45,6 @@ export class QuickEditComponent implements OnInit {
   public discardChanges(): void {
     this.data.resetDataForm();
     this._toggleEditMode(false);
-    this.discarded.emit();
   }
 
   private _toggleEditMode(editable: boolean): void {
@@ -57,6 +59,7 @@ export class QuickEditComponent implements OnInit {
       .subscribe(data => {
         Object.assign(this.data, data);
         this.data.resetDataForm();
+        this.saved.emit(data);
       })
   }
 

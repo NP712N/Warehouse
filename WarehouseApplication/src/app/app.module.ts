@@ -19,13 +19,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { QuickEditComponent } from './quick-edit/quick-edit/quick-edit.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { AgGridModule } from 'ag-grid-angular';
+import { ProductDetailAgGridComponent } from './product-detail-ag-grid/product-detail-ag-grid/product-detail-ag-grid.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductDetailsComponent,
     ProductDetailComponent,
-    QuickEditComponent
+    QuickEditComponent,
+    ProductDetailAgGridComponent
   ],
   imports: [
     BrowserModule,
@@ -43,7 +47,9 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    AgGridModule.withComponents([]),
+    ToastrModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
