@@ -29,16 +29,19 @@ export class ProductDetailAgGridComponent implements OnInit {
     {
       field: 'capacity',
       valueParser: 'Number(newValue)',
-      editable: true
+      editable: true,
+      sortable: true
     },
     {
       field: 'quantity',
-      editable: true
+      editable: true,
+      sortable: true
     }
   ];
 
   dataSource: ProductDetail[] = [];
   overlayLoadingTemplate: any;
+  rowSelection: any;
   defaultColDef: any;
 
   constructor(
@@ -47,8 +50,6 @@ export class ProductDetailAgGridComponent implements OnInit {
     private _dialog: MatDialog,
     private _toastr: ToastrService
   ) {
-    this.overlayLoadingTemplate =
-      '<span class="ag-overlay-loading-center">Please wait while your rows are loading</span>';
     this._initializeData();
   }
 
@@ -89,8 +90,25 @@ export class ProductDetailAgGridComponent implements OnInit {
     this.defaultColDef = {
       flex: 1,
       minWidth: 110,
-      resizable: true
+      resizable: true,
+      suppressKeyboardEvent: (params: any) => {
+        if (!params.editing) {
+          let isDeleteKey = params.event.keyCode === 46;
+
+          if (isDeleteKey) {
+            const selectedRows = params.api.getSelectedRows();
+            params.api.applyTransaction({ remove: selectedRows });
+            return true
+          }
+        }
+        return false;
+      }
     };
+
+    this.overlayLoadingTemplate =
+      '<span class="ag-overlay-loading-center">Please wait while your rows are loading</span>';
+
+    this.rowSelection = 'multiple';
   }
 
   private _initializeData() {

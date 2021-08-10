@@ -45,7 +45,7 @@ namespace Warehouse.Controllers
         [HttpPost]
         public IActionResult CreateProduct([FromBody] ProductCreateRequest request)
         {
-            if (request == null)
+            if (request == null || request.ProductName == null || request.ProductName == "")
             {
                 return BadRequest(ModelState);
             }
@@ -87,6 +87,12 @@ namespace Warehouse.Controllers
         [HttpPatch("{id}")]
         public IActionResult UpdateProduct(int id, [FromBody] ProductUpdateRequest payload)
         {
+            if (payload.ProductName == null || payload.ProductName == "")
+            {
+                ModelState.AddModelError("", "Product name should not be empty");
+                return StatusCode(404, ModelState);
+            }
+
             if (payload.Capacity < 1)
             {
                 ModelState.AddModelError("", "Capacity should not less than or equal to zero");

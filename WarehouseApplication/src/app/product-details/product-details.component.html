@@ -17,9 +17,13 @@
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
         <mat-cell *matCellDef="let row" [formGroup]="row.dataForm">
-          <ng-container *ngIf="!row.editable">{{row.productName}}</ng-container>
+          <ng-container *ngIf="row.loading">
+            <mat-progress-bar mode="query"></mat-progress-bar>
+          </ng-container>
 
-          <ng-container *ngIf="row.editable">
+          <ng-container *ngIf="!row.loading && !row.editable">{{row.productName}}</ng-container>
+
+          <ng-container *ngIf="!row.loading &&  row.editable">
             <mat-form-field>
               <input matInput formControlName="productName">
             </mat-form-field>
@@ -30,9 +34,13 @@
       <ng-container matColumnDef="capacity">
         <mat-header-cell *matHeaderCellDef>Capacity</mat-header-cell>
         <mat-cell *matCellDef="let row" [formGroup]="row.dataForm">
-          <ng-container *ngIf="!row.editable">{{row.capacity}}</ng-container>
+          <ng-container *ngIf="row.loading">
+            <mat-progress-bar mode="query"></mat-progress-bar>
+          </ng-container>
 
-          <ng-container *ngIf="row.editable">
+          <ng-container *ngIf="!row.loading && !row.editable">{{row.capacity}}</ng-container>
+
+          <ng-container *ngIf="!row.loading &&  row.editable">
             <mat-form-field>
               <input matInput formControlName="capacity">
             </mat-form-field>
@@ -43,9 +51,13 @@
       <ng-container matColumnDef="quantity">
         <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
         <mat-cell *matCellDef="let row" [formGroup]="row.dataForm">
-          <ng-container *ngIf="!row.editable">{{row.quantity}}</ng-container>
+          <ng-container *ngIf="row.loading">
+            <mat-progress-bar mode="query"></mat-progress-bar>
+          </ng-container>
 
-          <ng-container *ngIf="row.editable">
+          <ng-container *ngIf="!row.loading && !row.editable">{{row.quantity}}</ng-container>
+
+          <ng-container *ngIf="!row.loading &&  row.editable">
             <mat-form-field>
               <input matInput formControlName="quantity">
             </mat-form-field>

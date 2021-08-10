@@ -5,3 +5,8 @@
 .add-new{
   margin-bottom: 10px;
 }
+
+mat-progress-bar {
+  height: 42px;
+  width: 98%;
+}

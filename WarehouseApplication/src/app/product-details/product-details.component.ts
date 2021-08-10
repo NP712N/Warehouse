@@ -8,6 +8,7 @@ import { DataQueryResponse } from '../shared/data-query-response.model';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
 import { UtilServiceService } from '../shared/util-service.service';
+import { QuickDeleteComponent } from '../quick-edit/quick-delete/quick-delete.component';
 
 @Component({
   selector: 'app-product-details',
@@ -85,13 +86,19 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   public delete(id: number): void {
-    this._utilServiceService.execute(this.productDetailService.deleteProductDetail(id))
-      .pipe(
-        finalize(() => {
-          this.isLoading = false;
-          this._initializeData();
-        }))
-      .subscribe();
+    const dialogRef = this._dialog.open(QuickDeleteComponent);
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this._utilServiceService.execute(this.productDetailService.deleteProductDetail(id))
+          .pipe(
+            finalize(() => {
+              this.isLoading = false;
+              this._initializeData();
+            }))
+          .subscribe();
+      }
+    });
   }
 
   private _initializeData() {

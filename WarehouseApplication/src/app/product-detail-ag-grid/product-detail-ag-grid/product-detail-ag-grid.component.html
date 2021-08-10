@@ -3,6 +3,6 @@
 
   <ag-grid-angular class="ag-theme-alpine ag-grid" (cellValueChanged)="onCellValueChanged($event)" [pagination]="true"
     [defaultColDef]="defaultColDef" [rowData]="dataSource" [columnDefs]="columnDefs"
-    [overlayLoadingTemplate]="overlayLoadingTemplate">
+    [overlayLoadingTemplate]="overlayLoadingTemplate" [rowSelection]="rowSelection">
   </ag-grid-angular>
 </mat-card>

@@ -22,6 +22,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { AgGridModule } from 'ag-grid-angular';
 import { ProductDetailAgGridComponent } from './product-detail-ag-grid/product-detail-ag-grid/product-detail-ag-grid.component';
 import { ToastrModule } from 'ngx-toastr';
+import { QuickDeleteComponent } from './quick-edit/quick-delete/quick-delete.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,8 @@ import { ToastrModule } from 'ngx-toastr';
     ProductDetailsComponent,
     ProductDetailComponent,
     QuickEditComponent,
-    ProductDetailAgGridComponent
+    ProductDetailAgGridComponent,
+    QuickDeleteComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +51,7 @@ import { ToastrModule } from 'ngx-toastr';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatProgressBarModule,
     AgGridModule.withComponents([]),
     ToastrModule.forRoot()
   ],
